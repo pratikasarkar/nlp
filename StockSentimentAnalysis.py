@@ -7,7 +7,7 @@ Created on Mon Feb  1 00:13:31 2021
 
 import pandas as pd
 
-df = pd.read_csv("E://NLP//Data.csv",encoding="ISO-8859-1")
+df = pd.read_csv("E://NLP//stock-news-data//Data.csv",encoding="ISO-8859-1")
 
 train = df[df['Date'] < '20150101']
 test = df[df['Date'] > '20141231']
@@ -42,7 +42,7 @@ testdataset = countVectorizer.transform(test_transform)
 
 predictions = randomforestClassifier.predict(testdataset)
 
-from sklearn.metrics import confusion_matrix,accuracy_score,classification_report,roc_auc_score
+from sklearn.metrics import confusion_matrix,accuracy_score,classification_report
 matrix = confusion_matrix(test['Label'],predictions)
 accuracy = accuracy_score(test['Label'],predictions)
 classification_report = classification_report(test['Label'],predictions)
