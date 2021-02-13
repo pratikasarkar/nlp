@@ -8,6 +8,7 @@ Created on Mon Feb  1 08:51:16 2021
 import pandas as pd
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
+from nltk.stem import WordNetLemmatizer
 import re
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +19,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
 from sklearn.linear_model import PassiveAggressiveClassifier
 
-df = pd.read_csv("E://NLP//fake-news-data//train.csv")
+df = pd.read_csv("D://nlp//fake-news-data//train.csv")
 
 X = df.drop('label',axis = 1)
 
@@ -28,19 +29,30 @@ messages = df.copy()
 
 messages.reset_index(inplace=True)
 
-ps = PorterStemmer()
+#Stemming
+#ps = PorterStemmer()
+
+#Lemmatization
+wnl = WordNetLemmatizer()
 corpus = []
 for i in range(len(messages)):
+    # on title
     review = re.sub('[^a-zA-Z]',' ',messages['title'][i])
+    # on text
+    #review = re.sub('[^a-zA-Z]',' ',messages['text'][i])
     review = review.lower()
     review = review.split()
-    review = [ps.stem(word) for word in review if word not in set(stopwords.words('english'))]
+    review = [wnl.lemmatize(word) for word in review if word not in set(stopwords.words('english'))]
     review = " ".join(review)
     corpus.append(review)    
     
-    
-cv = CountVectorizer(max_features=5000,ngram_range=(1,3))
-X = cv.fit_transform(corpus).toarray()
+# CountVectorizer    
+#cv = CountVectorizer(max_features=5000,ngram_range=(1,3))
+
+# TfidfVectorizer
+tfidfVectorizer = TfidfVectorizer(max_features=5000,ngram_range=(1,3))
+
+X = tfidfVectorizer.fit_transform(corpus).toarray()
 
 y = messages['label']
 
@@ -93,5 +105,5 @@ for alpha in np.arange(0,1,0.1):
         classifier = sub_classifier
     print("Alpha : {}, Score : {}".format(alpha,score))
     
-feature_names = cv.get_feature_names()
+feature_names = tfidfVectorizer.get_feature_names()
 print(sorted(zip(classifier.coef_[0],feature_names))[:20]) # most fake words
